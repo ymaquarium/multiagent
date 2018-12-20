@@ -14,6 +14,7 @@ epoch = int(sys.argv[2])
 sample = int(sys.argv[3])
 func_list = ["Sphere", "Rastrign", "Rosenbrock", "Griewank", "Alpine", "Two_N_minima"]
 
+#functions
 def Sphere(array, N):
     return np.sum(np.square(array))
 
@@ -35,7 +36,7 @@ def Alpine(array, N):
 def Two_N_minima(array, N):
     return np.sum(np.square(np.square(array))-16*np.square(array)+5*array)
 
-
+#for evaluate fitness in onlooker_bee
 def softmax(N, sample, array, func_name):
     M = max([func_name(array[i], N) for i in range(sample)])
     eachArray = np.arange(sample, dtype="float")
@@ -46,6 +47,7 @@ def softmax(N, sample, array, func_name):
 
     return y 
 
+#update 
 def update_honey(honey1, honey2, func_name, trial_count_i):
     r = np.diag(np.random.rand(N)*2.0-1.0)
     honey_cande = honey1 +  np.dot(r, honey1-honey2)
@@ -115,6 +117,7 @@ def ABC(N, sample, func_name, x_min, x_max, epoch):
     
     return np.array(score_trend)
 
+#optimize functions by ABC
 def executer(N, sample, func_name, epoch):
     if func_name == "Sphere":
         return ABC(N, sample, Sphere, -5.0, 5.0, epoch)

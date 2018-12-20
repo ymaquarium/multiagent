@@ -13,6 +13,7 @@ epoch = int(sys.argv[2])
 sample = int(sys.argv[3])
 func_list = ["Sphere", "Rastrign", "Rosenbrock", "Griewank", "Alpine", "Two_N_minima"]
 
+#functions
 def Sphere(array, N):
     return np.sum(np.square(array))
 
@@ -74,6 +75,7 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
             velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
             current_x[i] = current_x[i] + velocity[i]
 
+    #last update
     for i in range(sample):
             value = func_name(current_x[i], N)
             if value < local_best_score[i]:
@@ -84,6 +86,7 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
 
     return np.array(score_trend)
 
+#optimize every function by PSO
 def executer(N, sample, func_name, epoch):
     if func_name == "Sphere":
         return PSO(N, sample, Sphere, -5.0, 5.0, epoch)
@@ -98,6 +101,7 @@ def executer(N, sample, func_name, epoch):
     elif func_name == "Two_N_minima":
         return PSO(N, sample, Two_N_minima, -5.0, 5.0, epoch)
 
+#generate optimizing graph
 def glaph_generator(func_list, N, sample, epoch):
     for func in func_list:
         x = np.arange(epoch/100+1)
