@@ -75,15 +75,6 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
             velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
             current_x[i] = current_x[i] + velocity[i]
 
-    #last update
-    for i in range(sample):
-            value = func_name(current_x[i], N)
-            if value < local_best_score[i]:
-                local_best_score[i] = value 
-    global_best_score = min(local_best_score)
-    global_best_point = local_best_point[local_best_score.index(min(local_best_score))]        
-    score_trend.append(global_best_score)
-
     return np.array(score_trend)
 
 #optimize every function by PSO
@@ -104,7 +95,7 @@ def executer(N, sample, func_name, epoch):
 #generate optimizing graph
 def glaph_generator(func_list, N, sample, epoch):
     for func in func_list:
-        x = np.arange(epoch/100+1)
+        x = np.arange(epoch/100)
         y = executer(N, sample, func, epoch)
 
         plt.plot(x, y, color='red', linestyle='solid', linewidth=1.0)
