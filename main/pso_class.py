@@ -38,15 +38,55 @@ class Function:
         return np.sum(np.square(np.square(array))-16*np.square(array)+5*array)
 
 class PSO:
-    def __init__(self, w, c1, c2, N):
+    def __init__(self, w=1.0, c1=1.0, c2=1.0, N):
         self.w = w
         self.c1 = c1 
         self.c2 = c2 
         self.N = N 
-        self.global_best = np.inf 
+        self.global_best_score = np.inf 
         self.global_best_point = np.zeros(N)
     
-    def 
+    def PSO(self, sample, func_name, x_min, x_max, epoch):
+    
+        r1 = random.random()
+        r2 = random.random()
+
+        #best_score and best_points
+        local_best_score = [np.inf for i in range(sample)]
+        local_best_point = [np.zeros(N) for i in range(sample)]
+
+        #particles
+        velocity = [np.zeros(N) for i in range(sample)]
+        current_x = [(x_max-x_min)*np.random.rand(N)+x_min for i in range(sample)]
+
+        #graph
+        score_trend = []
+
+        for time in range(epoch):
+            #evaluation
+            for i in range(sample):
+                value = func_name(current_x[i], N)
+                if value < local_best_score[i]:
+                    local_best_score[i] = value 
+            global_best_score = min(local_best_score)
+            global_best_point = local_best_point[local_best_score.index(min(local_best_score))]
+            if time%100 == 0:
+                score_trend.append(global_best_score)
+
+            #update
+            for i in range(sample):
+                velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
+                current_x[i] = current_x[i] + velocity[i]
+
+        for i in range(sample):
+                value = func_name(current_x[i], N)
+                if value < local_best_score[i]:
+                    local_best_score[i] = value 
+        global_best_score = min(local_best_score)
+        global_best_point = local_best_point[local_best_score.index(min(local_best_score))]        
+        score_trend.append(global_best_score)
+
+        return np.array(score_trend)
 
 
 
