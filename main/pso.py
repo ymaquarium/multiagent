@@ -26,8 +26,8 @@ def Rastrign(array, N):
 def Rosenbrock(array, N):
     s = 0
     for i in range(N-1):
-        s += 100*np.square(array[i+1]-np.square(array[i]))
-    return s +np.sum(np.square(1-array))-array[-1]
+        s += 100*np.square(array[i+1]-np.square(array[i])) +np.square(array[i]-1)
+    return s 
 
 def Griewank(array, N):
     return 1+np.sum(np.square(array))/4000-np.prod(np.cos(array/np.sqrt(np.arange(1, N+1))))
@@ -41,11 +41,6 @@ def Two_N_minima(array, N):
 
 def PSO(N, sample, func_name, x_min, x_max, epoch):
     
-    #coefficients
-    c1 = 1.0
-    c2 = 1.0
-    w = 1.0
-
     r1 = random.random()
     r2 = random.random()
 
@@ -67,11 +62,25 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
         value = func_name(current_x[i], N)
         if value < local_best_score[i]:
             local_best_score[i] = value 
+
+        #check
+        #print(str(func_name))
+        #print(local_best_score)
     global_best_score = min(local_best_score)
     global_best_point = local_best_point[local_best_score.index(min(local_best_score))]
     score_trend.append(global_best_score)
 
+    #coefficients
+    c1 = 1.8
+    c2 = 0.2
+    w = 0.8
+    #https://www.jstage.jst.go.jp/article/jasmin/2010f/0/2010f_0_84/_pdf/-char/ja
+
     for time in range(epoch):
+        if time >= 2*epoch//3:
+            c1, c2 = 0.2, 1.8
+        elif time >= epoch//3:
+            c1, c2 = 1.0, 1.0
         #update
         for i in range(sample):
             velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
@@ -82,11 +91,12 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
             value = func_name(current_x[i], N)
             if value < local_best_score[i]:
                 local_best_score[i] = value 
+            #check 
+            #if time%100==0:
+                #print(str(func_name))
+                #print(local_best_score)
         global_best_score = min(local_best_score)
         global_best_point = local_best_point[local_best_score.index(min(local_best_score))]
-        #check scores
-        #print(global_best_point)
-        #print(global_best_score)
         if time%100 == 0:
             score_trend.append(global_best_score)
 
@@ -107,7 +117,7 @@ def executer(N, sample, func_name, epoch):
     elif func_name == "Two_N_minima":
         return PSO(N, sample, Two_N_minima, -5.0, 5.0, epoch)
 
-#generate optimizing graph
+#generate optimizing graph and optimizing point
 def result_generator(func_list, N, sample, epoch):
     fig = plt.figure(figsize=(20, 20))
     plt.subplots_adjust(wspace=0.4, hspace=0.6)
@@ -121,6 +131,7 @@ def result_generator(func_list, N, sample, epoch):
         f.write(str(point))
         f.close
 
+        #graph paint
         plt.subplot(3, 2, i+1)
         plt.plot(x, y, color='red', linestyle='solid', linewidth=1.0)
         plt.title(func_list[i] + " Optimized by PSO")
