@@ -61,7 +61,8 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
     for i in range(sample):
         value = func_name(current_x[i], N)
         if value < local_best_score[i]:
-            local_best_score[i] = value 
+            local_best_score[i] = value
+            local_best_point[i] = current_x[i] 
 
         #check
         #print(str(func_name))
@@ -77,10 +78,13 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
     #https://www.jstage.jst.go.jp/article/jasmin/2010f/0/2010f_0_84/_pdf/-char/ja
 
     for time in range(epoch):
+
+        #parameter tuning
         if time >= 2*epoch//3:
             c1, c2 = 0.2, 1.8
         elif time >= epoch//3:
             c1, c2 = 1.0, 1.0
+
         #update
         for i in range(sample):
             velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
@@ -91,6 +95,7 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
             value = func_name(current_x[i], N)
             if value < local_best_score[i]:
                 local_best_score[i] = value 
+                local_best_point[i] = current_x[i]
             #check 
             #if time%100==0:
                 #print(str(func_name))
