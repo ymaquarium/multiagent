@@ -1,19 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt  
 import random
-import sys
+import sys, os
 
 #explain usage
-if len(sys.argv) < 3:
-    print("Usage: python3 pso.py dimension epoch sample")
+if len(sys.argv) < 4:
+    print("Usage: python3 pso.py dimension epoch sample save_dir_name")
 
 #general 
 N = int(sys.argv[1])
 epoch = int(sys.argv[2])
 sample = int(sys.argv[3])
-func_list = ["Sphere", "Rastrign", "Rosenbrock", "Griewank", "Alpine", "Two_N_minima"]
+save_dir = "../results/" + sys.argv[4] + "/"
+os.makedirs(save_dir, exist_ok=True)
 
 #functions
+func_list = ["Sphere", "Rastrign", "Rosenbrock", "Griewank", "Alpine", "Two_N_minima"]
+
 def Sphere(array, N):
     return np.sum(np.square(array))
 
@@ -59,7 +62,21 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
     #graph
     score_trend = []
 
+    #first evaluation
+    for i in range(sample):
+        value = func_name(current_x[i], N)
+        if value < local_best_score[i]:
+            local_best_score[i] = value 
+    global_best_score = min(local_best_score)
+    global_best_point = local_best_point[local_best_score.index(min(local_best_score))]
+    score_trend.append(global_best_score)
+
     for time in range(epoch):
+        #update
+        for i in range(sample):
+            velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
+            current_x[i] = current_x[i] + velocity[i]
+    
         #evaluation
         for i in range(sample):
             value = func_name(current_x[i], N)
@@ -67,15 +84,13 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
                 local_best_score[i] = value 
         global_best_score = min(local_best_score)
         global_best_point = local_best_point[local_best_score.index(min(local_best_score))]
+        #check scores
+        #print(global_best_point)
+        #print(global_best_score)
         if time%100 == 0:
             score_trend.append(global_best_score)
 
-        #update
-        for i in range(sample):
-            velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
-            current_x[i] = current_x[i] + velocity[i]
-
-    return np.array(score_trend)
+    return (np.array(score_trend), global_best_point)
 
 #optimize every function by PSO
 def executer(N, sample, func_name, epoch):
@@ -93,23 +108,32 @@ def executer(N, sample, func_name, epoch):
         return PSO(N, sample, Two_N_minima, -5.0, 5.0, epoch)
 
 #generate optimizing graph
-def glaph_generator(func_list, N, sample, epoch):
-    for func in func_list:
-        x = np.arange(epoch/100)
-        y = executer(N, sample, func, epoch)
+def result_generator(func_list, N, sample, epoch):
+    fig = plt.figure(figsize=(20, 20))
+    plt.subplots_adjust(wspace=0.4, hspace=0.6)
+    for i in range(len(func_list)):
+        x = np.arange(epoch/100+1)
+        y, point = executer(N, sample, func_list[i], epoch)
 
+        #optimizing point
+        np.set_printoptions(formatter={"float": '{:0.15f}'.format}) 
+        f = open(save_dir + "PSO Optimizing Point of "+func_list[i]+".txt", "w")
+        f.write(str(point))
+        f.close
+
+        plt.subplot(3, 2, i+1)
         plt.plot(x, y, color='red', linestyle='solid', linewidth=1.0)
-        plt.title(func + " Optimized by PSO")
+        plt.title(func_list[i] + " Optimized by PSO")
         plt.xlim((-1, epoch/100+1))
         plt.xlabel("Update Count")
-        plt.ylabel("Value of "+func+" Function")
+        plt.ylabel("Value of "+func_list[i]+" Function")
         if np.all(y>0):
             plt.yscale('log')
         plt.grid(True)
-        plt.savefig('PSO_' + func + '.png')
-        plt.clf()
+    plt.savefig(save_dir + 'PSO.png')
+     
 
 if __name__ == "__main__":
-    glaph_generator(func_list, N, sample, epoch)
+    result_generator(func_list, N, sample, epoch)
 
 
