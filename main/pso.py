@@ -72,19 +72,19 @@ def PSO(N, sample, func_name, x_min, x_max, epoch):
     score_trend.append(global_best_score)
 
     #coefficients
-    c1 = 1.8
-    c2 = 0.2
-    w = 0.8
-    #https://www.jstage.jst.go.jp/article/jasmin/2010f/0/2010f_0_84/_pdf/-char/ja
+    c1 = 1.8#1.0 #1.8
+    c2 = 0.2 #1.0 #0.2
+    w = 0.8 #1.0 #0.8
 
     for time in range(epoch):
-
+        
         #parameter tuning
         if time >= 2*epoch//3:
             c1, c2 = 0.2, 1.8
         elif time >= epoch//3:
             c1, c2 = 1.0, 1.0
-
+        #https://www.jstage.jst.go.jp/article/jasmin/2010f/0/2010f_0_84/_pdf/-char/ja
+        
         #update
         for i in range(sample):
             velocity[i] = w*velocity[i] + c1*r1*(local_best_point[i]-current_x[i]) + c2*r2*(global_best_point-current_x[i])
@@ -132,8 +132,13 @@ def result_generator(func_list, N, sample, epoch):
 
         #optimizing point
         np.set_printoptions(formatter={"float": '{:0.15f}'.format}) 
-        f = open(save_dir + "PSO Optimizing Point of "+func_list[i]+".txt", "w")
+        f = open(save_dir + "PSO Optimizing Result of "+func_list[i]+".txt", "w")
+        f.write("Optimizing Point\n")
         f.write(str(point))
+        f.write("\n")
+        f.write("\n")
+        f.write("Optimized Value\n")
+        f.write(str(y[-1]))
         f.close
 
         #graph paint

@@ -156,8 +156,13 @@ def result_generator(func_list, N, sample, epoch):
 
         #optimizing point
         np.set_printoptions(formatter={"float": '{:0.15f}'.format}) 
-        f = open(save_dir + "ABC Optimizing Point of "+func_list[i]+".txt", "w")
+        f = open(save_dir + "ABC Optimizing Result of "+func_list[i]+".txt", "w")
+        f.write("Optimizing Point\n")
         f.write(str(point))
+        f.write("\n")
+        f.write("\n")
+        f.write("Optimized Value\n")
+        f.write(str(y[-1]))
         f.close
 
         #graph paint
